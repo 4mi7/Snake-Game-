@@ -16,7 +16,12 @@ private int apple_y;
 private Image apple;
 private Image dot;
 private Image head;
+private boolean leftDirection = false;
+private boolean rightDirection = true;
+private boolean upDirection = false;
+private boolean downDirection = false;
     Board(){
+        addKeyListener(new Tadapter());
         setBackground(Color.BLACK);
         setFocusable(true);
         LoadImages();
@@ -64,8 +69,72 @@ timer.start();
         }
         Toolkit.getDefaultToolkit().sync();
     }
-    public void actionPerformed(ActionEvent ae){
+    
+    public void move(){
+        for(int i = dots; i > 0; i--){
+            x[i] = x[i-1];
+            y[i] = y[i-1];
+        }
+        if(leftDirection){
+            x[0] = x[0] - DOT_SIZE;
+        }
         
+        if(rightDirection){
+            x[0] = x[0] + DOT_SIZE;
+        }
+        
+        if(upDirection){
+            y[0] = y[0] - DOT_SIZE;
+        }
+        
+        if(downDirection){
+            y[0] = y[0] + DOT_SIZE;
+        }
+//        x[0] += DOT_SIZE;
     }
+    
+    public void checkApple(){
+        if((x[0] == apple_x) && (y[0] == apple_y)){
+            dots++;
+            locateApple();
+        }
+    }
+    public void actionPerformed(ActionEvent ae){
+        move();
+        checkApple();
+        repaint();
+    }
+    public class Tadapter extends KeyAdapter{
+        @Override
+        public void keyPressed(KeyEvent e) {
+         int key = e.getKeyCode();
+         
+         if(key == KeyEvent.VK_LEFT && (!rightDirection)){
+             leftDirection = true;
+             upDirection = false;
+             downDirection = false;
+         }
+         
+         if(key == KeyEvent.VK_RIGHT && (!leftDirection)){
+             rightDirection = true;
+             upDirection = false;
+             downDirection = false;
+         }
+         
+         if(key == KeyEvent.VK_UP&& (!downDirection)){
+             upDirection = true;
+             rightDirection = false;
+             leftDirection = false;
+         }
+         
+         if(key == KeyEvent.VK_DOWN && (!upDirection)){
+             downDirection = true;
+             rightDirection = false;
+             leftDirection = false;
+         }
+             
+        }
+    }
+
     }
 
