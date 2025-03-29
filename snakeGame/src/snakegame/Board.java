@@ -9,6 +9,7 @@ public class Board extends JPanel implements ActionListener{
 private final int ALL_DOTS = 900;
 private final int DOT_SIZE = 10;
 private final int RANDOM_POSITION = 34;
+private boolean inGame = true;
 private final int x[]= new int[ALL_DOTS];
 private final int y[]= new int[ALL_DOTS];
 private int apple_x;
@@ -24,6 +25,7 @@ private boolean downDirection = false;
         addKeyListener(new Tadapter());
         setBackground(Color.BLACK);
         setFocusable(true);
+        setPreferredSize(new Dimension(300, 300));
         LoadImages();
         initGame();
     }
@@ -59,6 +61,7 @@ timer.start();
         draw(g);
     }
     public void draw(Graphics g){
+        if(inGame){
         g.drawImage(apple, apple_x, apple_y , this);
         for(int i = 0; i<dots; i++){
             if(i==0){
@@ -68,8 +71,18 @@ timer.start();
             }
         }
         Toolkit.getDefaultToolkit().sync();
+    }else{
+            gameOver(g);
+        }
+  }
+    public void gameOver(Graphics g){
+        String msg = "Game Over !";
+        Font font = new Font("SAN SERIF", Font.BOLD, 14);
+        FontMetrics metrices = getFontMetrics(font);
+        g.setColor(Color.RED);
+        g.setFont(font);
+        g.drawString(msg, (300 - metrices.stringWidth(msg)) / 2, 300/2);
     }
-    
     public void move(){
         for(int i = dots; i > 0; i--){
             x[i] = x[i-1];
@@ -99,11 +112,44 @@ timer.start();
             locateApple();
         }
     }
+    
+    public void checkCollision(){
+        for(int i = dots; i > 0; i--){
+            if((i >4) && (x[0] == x[i]) && (y[0] == y[i])){
+                inGame = false;
+            }
+        }
+        if(y[0] >= 300){
+            inGame = false;
+        }
+        
+        if(x[0] >= 300){
+            inGame = false;
+        }
+        
+        if(x[0] < 0){
+            inGame = false;
+        }
+        
+        if(y[0] < 0){
+            inGame = false;
+        }
+        
+        if(!inGame){
+            timer.stop();
+        }
+    }
     public void actionPerformed(ActionEvent ae){
+        if(inGame){
         move();
         checkApple();
+        checkCollision();
         repaint();
+        
+        }
     }
+
+  
     public class Tadapter extends KeyAdapter{
         @Override
         public void keyPressed(KeyEvent e) {
